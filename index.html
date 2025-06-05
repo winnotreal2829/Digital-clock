@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đồng Hồ Kỹ Thuật Số</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Sử dụng font Inter */
+            background-color: #1a202c; /* Nền tối */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Ngăn cuộn */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="flex flex-col items-center justify-center p-6 bg-gray-800 rounded-3xl shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out w-11/12 md:w-3/4 lg:w-1/2 xl:w-2/5">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-emerald-400 text-center"></h1>
+        
+        <!-- Hiển thị Ngày, Tháng, Năm Dương Lịch -->
+        <div id="date-display" class="text-xl md:text-2xl font-medium text-gray-300 mb-2 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
+            <!-- Ngày Dương Lịch sẽ được cập nhật bởi JavaScript -->
+        </div>
+
+        <!-- Hiển thị Pha Mặt Trăng -->
+        <div id="moon-phase-display" class="text-xl md:text-2xl font-medium text-purple-300 mb-2 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
+            <!-- Pha Mặt Trăng sẽ được cập nhật bởi JavaScript -->
+        </div>
+
+        <!-- Hiển thị Lịch Âm Xấp Xỉ -->
+        <div id="lunar-date-display" class="text-xl md:text-2xl font-medium text-yellow-300 mb-4 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
+            <!-- Lịch Âm sẽ được cập nhật bởi JavaScript -->
+        </div>
+
+        <!-- Hiển thị Giờ, Phút, Giây -->
+        <div id="time-display" class="text-5xl md:text-7xl font-extrabold text-white mb-6 bg-gray-700 p-5 rounded-xl shadow-inner tracking-wider w-full text-center">
+            <!-- Thời gian sẽ được cập nhật bởi JavaScript -->
+        </div>
+
+        <!-- Phần múi giờ và nút xác định vị trí -->
+        <div class="flex flex-col items-center mb-4 w-full">
+            <button id="get-timezone-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 mb-3 w-auto md:w-3/4 lg:w-2/3">
+                <!-- Nút sẽ được cập nhật bởi JavaScript -->
+            </button>
+            <div id="timezone-info" class="text-lg md:text-xl font-semibold text-teal-300 bg-gray-700 px-4 py-2 rounded-lg text-center w-full">
+                <!-- Múi giờ sẽ hiển thị ở đây -->
+            </div>
+            <p id="geolocation-status" class="text-sm text-gray-400 mt-2 text-center">
+                <!-- Trạng thái xác định vị trí sẽ hiển thị ở đây -->
+            </p>
+        </div>
+
+        <!-- Thông tin liên hệ -->
+        <div class="text-gray-500 text-sm mt-4 text-center" id="contact-info">
+            <p></p>
+            <p></p>
+            <p></p>
+        </div>
+        
+    </div>
+
+    <script>
+        // Đối tượng chứa tất cả các chuỗi dịch cho các ngôn ngữ khác nhau
+        const translations = {
+            'vi-VN': {
+                title: "Đồng Hồ Kỹ Thuật Số",
+                moonPhases: [
+                    "Trăng non", "Trăng lưỡi liềm đầu tháng", "Trăng bán nguyệt đầu tháng",
+                    "Trăng khuyết đầu tháng", "Trăng tròn", "Trăng khuyết cuối tháng",
+                    "Trăng bán nguyệt cuối tháng", "Trăng lưỡi liềm cuối tháng"
+                ],
+                lunarMonths: [
+                    "Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu",
+                    "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Chạp"
+                ],
+                lunarDateTemplate: "Ngày {day}, Tháng {month}, Năm {year}",
+                lunarDisclaimer: "(Âm lịch - Xấp xỉ)",
+                timezoneButton: "Xác định Múi giờ của tôi",
+                timezoneInfoDefault: "Đang hiển thị múi giờ hệ thống của bạn.",
+                timezoneInfoSystem: "Múi giờ hệ thống: ",
+                timezoneError: "Không thể lấy múi giờ hệ thống.",
+                geolocationAttempt: "Đang cố gắng xác định vị trí...",
+                geolocationSuccess: "Vị trí: Lat {lat}, Lon {lon}. Thời gian hiển thị theo múi giờ hệ thống của bạn.",
+                geolocationDenied: "Bạn đã từ chối quyền truy cập vị trí. Vui lòng cho phép để xác định vị trí.",
+                geolocationUnavailable: "Thông tin vị trí không khả dụng.",
+                geolocationTimeout: "Yêu cầu xác định vị trí đã hết thời gian.",
+                geolocationUnknownError: "Đã xảy ra lỗi không xác định khi xác định vị trí.",
+                geolocationNotSupported: "Trình duyệt của bạn không hỗ trợ Geolocation API.",
+                madeBy: "Được tạo bởi Richard",
+                contactEmail: "Email: ",
+                contactUs: "(Liên hệ chúng tôi để sửa lỗi khi trang web gặp sự cố hoặc lỗi múi giờ)"
+            },
+            'en-US': {
+                title: "Digital Clock",
+                moonPhases: [
+                    "New Moon", "Waxing Crescent", "First Quarter",
+                    "Waxing Gibbous", "Full Moon", "Waning Gibbous",
+                    "Last Quarter", "Waning Crescent"
+                ],
+                lunarMonths: [
+                    "Lunar January", "Lunar February", "Lunar March", "Lunar April", "Lunar May", "Lunar June",
+                    "Lunar July", "Lunar August", "Lunar September", "Lunar October", "Lunar November", "Lunar December" 
+                ],
+                lunarDateTemplate: "Lunar Day {day}, Lunar Month {month}, Year {year}",
+                lunarDisclaimer: "(Approx.)",
+                timezoneButton: "Detect My Timezone",
+                timezoneInfoDefault: "Displaying your system timezone.",
+                timezoneInfoSystem: "System Timezone: ",
+                timezoneError: "Could not retrieve system timezone.",
+                geolocationAttempt: "Attempting to detect location...",
+                geolocationSuccess: "Location: Lat {lat}, Lon {lon}. Time displayed according to your system timezone.",
+                geolocationDenied: "You denied location access. Please allow to detect location.",
+                geolocationUnavailable: "Location information is unavailable.",
+                geolocationTimeout: "Location request timed out.",
+                geolocationUnknownError: "An unknown error occurred while detecting location.",
+                geolocationNotSupported: "Your browser does not support Geolocation API.",
+                madeBy: "Made by Richard",
+                contactEmail: "Email: ",
+                contactUs: "(Contact us to fix errors when the website has problems or timezone errors)"
+            },
+            'fr-FR': {
+                title: "Horloge Numérique",
+                moonPhases: [
+                    "Nouvelle Lune", "Premier Croissant", "Premier Quartier",
+                    "Lune Gibbeuse Croissante", "Pleine Lune", "Lune Gibbeuse Décroissante",
+                    "Dernier Quartier", "Dernier Croissant"
+                ],
+                lunarMonths: [
+                    "Janvier Lunaire", "Février Lunaire", "Mars Lunaire", "Avril Lunaire", "Mai Lunaire", "Juin Lunaire",
+                    "Juillet Lunaire", "Août Lunaire", "Septembre Lunaire", "Octobre Lunaire", "Novembre Lunaire", "Décembre Lunaire"
+                ],
+                lunarDateTemplate: "Jour lunaire {day}, Mois lunaire {month}, Année {year}",
+                lunarDisclaimer: "(Approx.)",
+                timezoneButton: "Détecter mon fuseau horaire",
+                timezoneInfoDefault: "Affichage de votre fuseau horaire système.",
+                timezoneInfoSystem: "Fuseau horaire du système : ",
+                timezoneError: "Impossible de récupérer le fuseau horaire système.",
+                geolocationAttempt: "Tentative de détection de l'emplacement...",
+                geolocationSuccess: "Emplacement : Lat {lat}, Lon {lon}. L'heure est affichée selon le fuseau horaire de votre système.",
+                geolocationDenied: "Vous avez refusé l'accès à la localisation. Veuillez l'autoriser pour détecter l'emplacement.",
+                geolocationUnavailable: "Les informations de localisation ne sont pas disponibles.",
+                geolocationTimeout: "La demande de localisation a expiré.",
+                geolocationUnknownError: "Une erreur inconnue s'est produite lors de la détection de l'emplacement.",
+                geolocationNotSupported: "Votre navigateur ne prend pas en charge l'API de géolocalisation.",
+                madeBy: "Créé par Richard",
+                contactEmail: "E-mail : ",
+                contactUs: "(Contactez-nous pour corriger les erreurs lorsque le site web a des problèmes ou des erreurs de fuseau horaire)"
+            },
+            'es-ES': {
+                title: "Reloj Digital",
+                moonPhases: [
+                    "Luna Nueva", "Creciente", "Cuarto Creciente", "Gibosa Creciente", "Luna Llena", "Gibosa Menguante", "Cuarto Menguante", "Menguante"
+                ],
+                lunarMonths: [
+                    "Enero Lunar", "Febrero Lunar", "Marzo Lunar", "Abril Lunar", "Mayo Lunar", "Junio Lunar",
+                    "Julio Lunar", "Agosto Lunar", "Septiembre Lunar", "Octubre Lunar", "Noviembre Lunar", "Diciembre Lunar"
+                ],
+                lunarDateTemplate: "Día lunar {day}, Mes lunar {month}, Año {year}",
+                lunarDisclaimer: "(Aprox.)",
+                timezoneButton: "Detectar mi Zona Horaria",
+                timezoneInfoDefault: "Mostrando su zona horaria del sistema.",
+                timezoneInfoSystem: "Zona horaria del sistema: ",
+                timezoneError: "No se pudo recuperar la zona horaria del sistema.",
+                geolocationAttempt: "Intentando detectar ubicación...",
+                geolocationSuccess: "Ubicación: Lat {lat}, Lon {lon}. Hora mostrada según la zona horaria de su sistema.",
+                geolocationDenied: "Ha denegado el acceso a la ubicación. Por favor, permita para detectar la ubicación.",
+                geolocationUnavailable: "La información de ubicación no está disponible.",
+                geolocationTimeout: "La solicitud de ubicación ha caducado.",
+                geolocationUnknownError: "Ocurrió un error desconocido al detectar la ubicación.",
+                geolocationNotSupported: "Su navegador no soporta la API de Geolocation.",
+                madeBy: "Hecho por Richard",
+                contactEmail: "Correo electrónico: ",
+                contactUs: "(Contáctenos para solucionar errores cuando el sitio web tenga problemas o errores de zona horaria)"
+            },
+            'de-DE': {
+                title: "Digitale Uhr",
+                moonPhases: [
+                    "Neumond", "Zunehmende Sichel", "Erstes Viertel", "Zunehmender Halbmond", "Vollmond", "Abnehmender Halbmond", "Letztes Viertel", "Abnehmende Sichel"
+                ],
+                lunarMonths: [
+                    "Lunarer Januar", "Lunarer Februar", "Lunarer März", "Lunarer April", "Lunarer Mai", "Lunarer Juni",
+                    "Lunarer Juli", "Lunarer August", "Lunarer September", "Lunarer Oktober", "Lunarer November", "Lunarer Dezember"
+                ],
+                lunarDateTemplate: "Mondtag {day}, Mondmonat {month}, Jahr {year}",
+                lunarDisclaimer: "(Ca.)",
+                timezoneButton: "Meine Zeitzone erkennen",
+                timezoneInfoDefault: "Ihre Systemzeitzone wird angezeigt.",
+                timezoneInfoSystem: "Systemzeitzone: ",
+                timezoneError: "Systemzeitzone konnte nicht abgerufen werden.",
+                geolocationAttempt: "Versuche Standort zu erkennen...",
+                geolocationSuccess: "Standort: Lat {lat}, Lon {lon}. Uhrzeit wird entsprechend Ihrer Systemzeitzone angezeigt.",
+                geolocationDenied: "Sie haben den Standortzugriff verweigert. Bitte erlauben Sie die Standortbestimmung.",
+                geolocationUnavailable: "Standortinformationen sind nicht verfügbar.",
+                geolocationTimeout: "Standortanfrage ist abgelaufen.",
+                geolocationUnknownError: "Ein unbekannter Fehler ist bei der Standortbestimmung aufgetreten.",
+                geolocationNotSupported: "Ihr Browser unterstützt die Geolocation API nicht.",
+                madeBy: "Erstellt von Richard",
+                contactEmail: "E-Mail: ",
+                contactUs: "(Kontaktieren Sie uns, um Fehler zu beheben, wenn die Website Probleme oder Zeitzonenfehler aufweist)"
+            },
+            'zh-CN': {
+                title: "数字时钟",
+                moonPhases: [
+                    "新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"
+                ],
+                lunarMonths: [
+                    "正月", "二月", "三月", "四月", "五月", "六月",
+                    "七月", "八月", "九月", "十月", "冬月", "腊月"
+                ],
+                lunarDateTemplate: "农历 {year} 年 {month} {day} 日",
+                lunarDisclaimer: "(近似)",
+                timezoneButton: "检测我的时区",
+                timezoneInfoDefault: "正在显示您的系统时区。",
+                timezoneInfoSystem: "系统时区: ",
+                timezoneError: "无法获取系统时区。",
+                geolocationAttempt: "正在尝试检测位置...",
+                geolocationSuccess: "位置: 纬度 {lat}, 经度 {lon}。时间根据您的系统时区显示。",
+                geolocationDenied: "您已拒绝位置访问。请允许以检测位置。",
+                geolocationUnavailable: "位置信息不可用。",
+                geolocationTimeout: "位置请求超时。",
+                geolocationUnknownError: "检测位置时发生未知错误。",
+                geolocationNotSupported: "您的浏览器不支持地理定位API。",
+                madeBy: "由 Richard 制作",
+                contactEmail: "电子邮件: ",
+                contactUs: "(网站出现问题或时区错误时请联系我们修复)"
+            },
+            'ja-JP': {
+                title: "デジタル時計",
+                moonPhases: [
+                    "新月", "三日月", "上弦の月", "十三夜月", "満月", "十六夜月", "下弦の月", "二十六夜月"
+                ],
+                lunarMonths: [
+                    "旧暦1月", "旧暦2月", "旧暦3月", "旧暦4月", "旧暦5月", "旧暦6月",
+                    "旧暦7月", "旧暦8月", "旧暦9月", "旧暦10月", "旧暦11月", "旧暦12月"
+                ],
+                lunarDateTemplate: "旧暦 {year} 年 {month} {day} 日",
+                lunarDisclaimer: "(概算)",
+                timezoneButton: "私のタイムゾーンを検出",
+                timezoneInfoDefault: "システムタイムゾーンを表示しています。",
+                timezoneInfoSystem: "システムタイムゾーン: ",
+                timezoneError: "システムタイムゾーンを取得できませんでした。",
+                geolocationAttempt: "位置を検出中...",
+                geolocationSuccess: "位置: 緯度 {lat}, 経度 {lon}。システムタイムゾーンに従って時間が表示されます。",
+                geolocationDenied: "位置情報へのアクセスを拒否しました。位置情報を検出するには許可してください。",
+                geolocationUnavailable: "位置情報が利用できません。",
+                geolocationTimeout: "位置情報要求がタイムアウトしました。",
+                geolocationUnknownError: "位置情報検出中に不明なエラーが発生しました。",
+                geolocationNotSupported: "お使いのブラウザはGeolocation APIをサポートしていません。",
+                madeBy: "Richard 作",
+                contactEmail: "メール: ",
+                contactUs: "(ウェブサイトに問題やタイムゾーンエラーがある場合は、お問い合わせください)"
+            },
+            'ru-RU': {
+                title: "Цифровые Часы",
+                moonPhases: [
+                    "Новолуние", "Растущий Серп", "Первая Четверть", "Растущая Луна", "Полнолуние", "Убывающая Луна", "Последняя Четверть", "Убывающий Серп"
+                ],
+                lunarMonths: [
+                    "Лунный январь", "Лунный февраль", "Лунный март", "Лунный апрель", "Лунный май", "Лунный июнь",
+                    "Лунный июль", "Лунный август", "Лунный сентябрь", "Лунный октябрь", "Лунный ноябрь", "Лунный декабрь"
+                ],
+                lunarDateTemplate: "Лунный день {day}, Лунный месяц {month}, Год {year}",
+                lunarDisclaimer: "(Прибл.)",
+                timezoneButton: "Определить мой часовой пояс",
+                timezoneInfoDefault: "Отображается системный часовой пояс.",
+                timezoneInfoSystem: "Системный часовой пояс: ",
+                timezoneError: "Не удалось получить системный часовой пояс.",
+                geolocationAttempt: "Попытка определения местоположения...",
+                geolocationSuccess: "Местоположение: Шир {lat}, Долг {lon}. Время отображается в соответствии с вашим системным часовым поясом.",
+                geolocationDenied: "Вы отказали в доступе к местоположению. Пожалуйста, разрешите для определения местоположения.",
+                geolocationUnavailable: "Информация о местоположении недоступна.",
+                geolocationTimeout: "Время ожидания запроса местоположения истекло.",
+                geolocationUnknownError: "При определении местоположения произошла неизвестная ошибка.",
+                geolocationNotSupported: "Ваш браузер не поддерживает Geolocation API." ,
+                madeBy: "Сделано Richard",
+                contactEmail: "Эл. почта: ",
+                contactUs: "(Свяжитесь с нами для исправления ошибок, если на сайте возникнут проблемы или ошибки часового пояса)"
+            },
+            'ar-SA': { // Arabic (Saudi Arabia)
+                title: "ساعة رقمية",
+                moonPhases: [
+                    "محاق", "هلال متزايد", "تربيع أول", "أحدب متزايد", "بدر", "أحدب متناقص", "تربيع أخير", "هلال متناقص"
+                ],
+                lunarMonths: [
+                    "محرم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأول", "جمادى الآخر", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
+                ],
+                lunarDateTemplate: "اليوم القمري {day}, الشهر القمري {month}, عام {year}",
+                lunarDisclaimer: "(تقريبي)",
+                timezoneButton: "الكشف عن منطقتي الزمنية",
+                timezoneInfoDefault: "يتم عرض المنطقة الزمنية لنظامك.",
+                timezoneInfoSystem: "المنطقة الزمنية للنظام: ",
+                timezoneError: "تعذر استرداد المنطقة الزمنية للنظام.",
+                geolocationAttempt: "جاري محاولة تحديد الموقع...",
+                geolocationSuccess: "الموقع: خط عرض {lat}, خط طول {lon}. الوقت معروض حسب المنطقة الزمنية لنظامك.",
+                geolocationDenied: "لقد رفضت الوصول إلى الموقع. يرجى السماح بتحديد الموقع.",
+                geolocationUnavailable: "معلومات الموقع غير متوفرة.",
+                geolocationTimeout: "انتهت مهلة طلب تحديد الموقع.",
+                geolocationUnknownError: "حدث خطأ غير معروف أثناء تحديد الموقع.",
+                geolocationNotSupported: "متصفحك لا يدعم واجهة برمجة تطبيقات تحديد الموقع الجغرافي.",
+                madeBy: "صنع بواسطة ريتشارد",
+                contactEmail: "البريد الإلكتروني: ",
+                contactUs: "(اتصل بنا لإصلاح الأخطاء عندما يواجه الموقع مشاكل أو أخطاء في المنطقة الزمنية)"
+            }
+        };
+
+        // Biến toàn cục để lưu trữ bản dịch hiện tại
+        let currentTranslation;
+
+        /**
+         * Hàm này khởi tạo và cập nhật các phần tử giao diện người dùng tĩnh
+         * dựa trên ngôn ngữ được phát hiện.
+         * Tham số:
+         * - localeKey: Khóa ngôn ngữ đã được chọn từ đối tượng translations (ví dụ: 'vi-VN', 'en-US').
+         */
+        function initializeUIText(localeKey) {
+            currentTranslation = translations[localeKey];
+
+            // Cập nhật tiêu đề
+            document.querySelector('h1').textContent = currentTranslation.title;
+
+            // Cập nhật nút múi giờ
+            document.getElementById('get-timezone-btn').textContent = currentTranslation.timezoneButton;
+            document.getElementById('timezone-info').textContent = currentTranslation.timezoneInfoDefault;
+
+            // Cập nhật thông tin liên hệ
+            const contactInfoDiv = document.getElementById('contact-info');
+            contactInfoDiv.querySelector('p:nth-child(1)').textContent = currentTranslation.madeBy;
+            contactInfoDiv.querySelector('p:nth-child(2)').innerHTML = `${currentTranslation.contactEmail}<a href="mailto:trannguyen200829@gmail.com" class="text-blue-400 hover:underline">trannguyen200829@gmail.com</a>`;
+            contactInfoDiv.querySelector('p:nth-child(3)').textContent = currentTranslation.contactUs;
+        }
+
+        /**
+         * Hàm này tính toán pha mặt trăng hiện tại dựa trên ngày đã cho.
+         * Nó sử dụng một thuật toán đơn giản dựa trên chu kỳ trăng non.
+         * Tham số:
+         * - date: Đối tượng Date() hiện tại (UTC).
+         * - translations: Đối tượng bản dịch hiện tại.
+         * Trả về:
+         * - Một đối tượng chứa tên pha đã dịch và biểu tượng cảm xúc tương ứng.
+         */
+        function getMoonPhase(date, translations) {
+            // Ngày trăng non được biết đến gần đây (6 tháng 1 năm 2000, 18:15 UT)
+            // Sử dụng Date.UTC để đảm bảo tính toán không bị ảnh hưởng bởi múi giờ cục bộ.
+            const epoch = new Date(Date.UTC(2000, 0, 6, 18, 15, 0)); 
+            const msPerDay = 24 * 60 * 60 * 1000;         // Số mili giây trong một ngày
+            const synodicMonth = 29.53058867;             // Chu kỳ giao hội trung bình của mặt trăng (khoảng 29.53 ngày)
+
+            const diffMs = date.getTime() - epoch.getTime();
+            let diffDays = diffMs / msPerDay;
+
+            let moonAge = diffDays % synodicMonth;
+            if (moonAge < 0) {
+                moonAge += synodicMonth; // Đảm bảo giá trị dương
+            }
+
+            // Dùng tên pha từ đối tượng translations
+            const phaseNames = translations.moonPhases;
+
+            if (moonAge < 1.84) return { name: phaseNames[0], emoji: "🌑" };
+            if (moonAge < 5.53) return { name: phaseNames[1], emoji: "🌒" };
+            if (moonAge < 9.22) return { name: phaseNames[2], emoji: "🌓" };
+            if (moonAge < 12.91) return { name: phaseNames[3], emoji: "🌔" };
+            if (moonAge < 16.61) return { name: phaseNames[4], emoji: "🌕" };
+            if (moonAge < 20.30) return { name: phaseNames[5], emoji: "🌖" };
+            if (moonAge < 23.99) return { name: phaseNames[6], emoji: "🌗" };
+            if (moonAge < 27.69) return { name: phaseNames[7], emoji: "🌘" };
+            return { name: phaseNames[0], emoji: "🌑" }; // Quay lại trăng non
+        }
+
+        /**
+         * Hàm này tính toán ngày, tháng, năm âm lịch xấp xỉ dựa trên ngày dương lịch.
+         * LƯU Ý QUAN TRỌNG:
+         * Đây là một TÍNH TOÁN RẤT ĐƠN GIẢN VÀ XẤP XỈ.
+         * Nó KHÔNG ĐẠI DIỆN cho một lịch âm chính xác và đầy đủ (cần các thuật toán phức tạp,
+         * xử lý tháng nhuận, xác định khởi đầu năm âm lịch và các quy tắc của lịch âm truyền thống).
+         * Đối với độ chính xác trong thực tế, hãy cân nhắc sử dụng một thư viện lịch âm chuyên dụng.
+         *
+         * Tham số:
+         * - date: Đối tượng Date() hiện tại (dương lịch).
+         * - translations: Đối tượng bản dịch hiện tại.
+         * Trả về:
+         * - Chuỗi ngày, tháng, năm âm lịch xấp xỉ đã dịch.
+         */
+        function getApproximateLunarDate(date, translations) {
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const synodicMonth = 29.53058867; // Chiều dài trung bình của tháng giao hội
+
+            const epochNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 15, 0));
+
+            const diffMs = date.getTime() - epochNewMoon.getTime();
+            let daysSinceEpoch = diffMs / msPerDay;
+
+            let moonAge = daysSinceEpoch % synodicMonth;
+            if (moonAge < 0) {
+                moonAge += synodicMonth;
+            }
+
+            const lunarDay = Math.floor(moonAge) + 1;
+
+            const totalSynodicCycles = Math.floor(daysSinceEpoch / synodicMonth);
+            let lunarMonthApproxIndex = totalSynodicCycles % 12;
+
+            const lunarMonthName = translations.lunarMonths[lunarMonthApproxIndex];
+            const lunarYear = date.getFullYear(); // Vẫn dùng năm dương lịch cho đơn giản
+
+            // Sử dụng template đã dịch
+            let lunarDateString = translations.lunarDateTemplate
+                .replace('{day}', lunarDay)
+                .replace('{month}', lunarMonthName)
+                .replace('{year}', lunarYear);
+            
+            return `${lunarDateString} ${translations.lunarDisclaimer}`;
+        }
+
+        /**
+         * Hàm này cập nhật đồng hồ kỹ thuật số, pha mặt trăng và lịch âm xấp xỉ.
+         * Nó lấy ngày và giờ hiện tại, định dạng chúng và hiển thị lên trang.
+         * Đồng thời, nó tính toán và hiển thị pha mặt trăng và ngày, tháng, năm âm lịch xấp xỉ.
+         */
+        function updateClock() {
+            const now = new Date(); // Lấy đối tượng ngày tháng hiện tại
+
+            // Định dạng ngày Dương Lịch theo locale của người dùng
+            const optionsDate = {
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long',   
+                day: 'numeric'   
+            };
+            const dateString = now.toLocaleDateString(navigator.language, optionsDate); 
+
+            // Lấy pha mặt trăng và lịch âm xấp xỉ với đối tượng bản dịch hiện tại
+            const moonPhase = getMoonPhase(now, currentTranslation);
+            const approxLunarDate = getApproximateLunarDate(now, currentTranslation);
+
+            // Định dạng thời gian theo locale của người dùng
+            const optionsTime = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // Định dạng 24h
+            };
+            const timeString = now.toLocaleTimeString(navigator.language, optionsTime); 
+
+            // Cập nhật các phần tử HTML
+            document.getElementById('date-display').textContent = dateString; 
+            document.getElementById('moon-phase-display').textContent = `${moonPhase.emoji} ${moonPhase.name}`; 
+            document.getElementById('lunar-date-display').textContent = approxLunarDate;
+            document.getElementById('time-display').textContent = timeString; 
+        }
+
+        /**
+         * Hàm này hiển thị múi giờ hệ thống của người dùng.
+         */
+        function displaySystemTimeZone() {
+            const timeZoneElement = document.getElementById('timezone-info');
+            try {
+                const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                timeZoneElement.textContent = `${currentTranslation.timezoneInfoSystem}${userTimeZone}`;
+            } catch (error) {
+                timeZoneElement.textContent = currentTranslation.timezoneError;
+                console.error("Lỗi lấy múi giờ hệ thống:", error);
+            }
+        }
+
+        // Lắng nghe sự kiện click cho nút xác định múi giờ
+        document.getElementById('get-timezone-btn').addEventListener('click', () => {
+            const geolocationStatus = document.getElementById('geolocation-status');
+            geolocationStatus.textContent = currentTranslation.geolocationAttempt;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        geolocationStatus.textContent = currentTranslation.geolocationSuccess
+                            .replace('{lat}', latitude.toFixed(4))
+                            .replace('{lon}', longitude.toFixed(4));
+                        displaySystemTimeZone(); 
+                    },
+                    (error) => {
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                geolocationStatus.textContent = currentTranslation.geolocationDenied;
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                geolocationStatus.textContent = currentTranslation.geolocationUnavailable;
+                                break;
+                            case error.TIMEOUT:
+                                geolocationStatus.textContent = currentTranslation.geolocationTimeout;
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                geolocationStatus.textContent = currentTranslation.geolocationUnknownError;
+                                break;
+                        }
+                        console.error("Lỗi xác định vị trí:", error);
+                    }
+                );
+            } else {
+                geolocationStatus.textContent = currentTranslation.geolocationNotSupported;
+            }
+        });
+
+        // --- Khởi tạo khi trang tải ---
+        window.onload = function() {
+            const userPreferredLocales = navigator.languages || [navigator.language || 'en-US'];
+            let foundLocaleKey = 'en-US'; // Mặc định là Tiếng Anh
+
+            // Tìm kiếm bản dịch phù hợp nhất
+            for (const prefLocale of userPreferredLocales) {
+                const lowerCasePrefLocale = prefLocale.toLowerCase();
+                
+                // 1. Thử khớp chính xác (không phân biệt hoa/thường)
+                for (const key in translations) {
+                    if (key.toLowerCase() === lowerCasePrefLocale) {
+                        foundLocaleKey = key;
+                        break; 
+                    }
+                }
+                if (foundLocaleKey !== 'en-US') break; // Đã tìm thấy khớp chính xác
+
+                // 2. Thử khớp theo ngôn ngữ cơ bản (không phân biệt hoa/thường)
+                const baseLang = lowerCasePrefLocale.split('-')[0];
+                for (const key in translations) {
+                    if (key.toLowerCase().startsWith(baseLang)) {
+                        foundLocaleKey = key;
+                        break; 
+                    }
+                }
+                if (foundLocaleKey !== 'en-US') break; // Đã tìm thấy khớp theo ngôn ngữ cơ bản
+            }
+
+            initializeUIText(foundLocaleKey); // Khởi tạo UI text với ngôn ngữ đã chọn
+
+            updateClock(); // Cập nhật đồng hồ lần đầu
+            displaySystemTimeZone(); // Hiển thị múi giờ hệ thống
+            setInterval(updateClock, 1000); // Cập nhật đồng hồ mỗi giây
+        };
+    </script>
+</body>
+</html>
+
