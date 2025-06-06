@@ -8,71 +8,69 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif; /* Use Inter font */
-            background-color: #1a202c; /* Dark background */
+            font-family: 'Inter', sans-serif; /* Sử dụng font Inter */
+            background-color: #1a202c; /* Nền tối */
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; /* Đảm bảo body chiếm ít nhất toàn bộ chiều cao của khung nhìn */
             margin: 0;
-            overflow: hidden; /* Prevent scrolling */
+            /* Đã xóa overflow: hidden; để cho phép cuộn */
+        }
+        /* Đảm bảo phần chính của nội dung có thể cuộn */
+        .main-content-wrapper {
+            margin-top: 2rem; /* Khoảng cách trên */
+            margin-bottom: 2rem; /* Khoảng cách dưới */
+            min-height: calc(100vh - 4rem); /* Đảm bảo đủ không gian nếu nội dung ít hơn viewport */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Giữ nội dung giữa nếu có đủ không gian */
+        }
+
+        /* Thêm khả năng cuộn cho toàn bộ trang nếu nội dung vượt quá màn hình */
+        html, body {
+            height: 100%; /* Đảm bảo html và body có chiều cao đầy đủ */
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <div class="flex flex-col items-center justify-center p-6 bg-gray-800 rounded-3xl shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out w-11/12 md:w-3/4 lg:w-1/2 xl:w-2/5">
+    <div class="flex flex-col items-center justify-center p-6 bg-gray-800 rounded-3xl shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out w-11/12 md:w-3/4 lg:w-1/2 xl:w-2/5 main-content-wrapper">
         <h1 class="text-3xl md:text-4xl font-bold mb-4 text-emerald-400 text-center"></h1>
         
-        <!-- Display Date, Month, Year (Gregorian Calendar) -->
+        <!-- Hiển thị Ngày, Tháng, Năm Dương Lịch -->
         <div id="date-display" class="text-xl md:text-2xl font-medium text-gray-300 mb-2 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
-            <!-- Gregorian Date will be updated by JavaScript -->
+            <!-- Ngày Dương Lịch sẽ được cập nhật bởi JavaScript -->
         </div>
 
-        <!-- Display Moon Phase -->
+        <!-- Hiển thị Pha Mặt Trăng -->
         <div id="moon-phase-display" class="text-xl md:text-2xl font-medium text-purple-300 mb-2 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
-            <!-- Moon Phase will be updated by JavaScript -->
+            <!-- Pha Mặt Trăng sẽ được cập nhật bởi JavaScript -->
         </div>
 
-        <!-- Display Approximate Lunar Calendar -->
+        <!-- Hiển thị Lịch Âm Xấp Xỉ -->
         <div id="lunar-date-display" class="text-xl md:text-2xl font-medium text-yellow-300 mb-4 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
-            <!-- Lunar Date will be updated by JavaScript -->
+            <!-- Lịch Âm sẽ được cập nhật bởi JavaScript -->
         </div>
 
-        <!-- Display Hour, Minute, Second -->
+        <!-- Hiển thị Giờ, Phút, Giây -->
         <div id="time-display" class="text-5xl md:text-7xl font-extrabold text-white mb-6 bg-gray-700 p-5 rounded-xl shadow-inner tracking-wider w-full text-center">
-            <!-- Time will be updated by JavaScript -->
+            <!-- Thời gian sẽ được cập nhật bởi JavaScript -->
         </div>
 
-        <!-- Timezone section and detection button -->
+        <!-- Phần múi giờ và nút xác định vị trí -->
         <div class="flex flex-col items-center mb-4 w-full">
             <button id="get-timezone-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 mb-3 w-auto md:w-3/4 lg:w-2/3">
-                <!-- Button text will be updated by JavaScript -->
+                <!-- Nút sẽ được cập nhật bởi JavaScript -->
             </button>
             <div id="timezone-info" class="text-lg md:text-xl font-semibold text-teal-300 bg-gray-700 px-4 py-2 rounded-lg text-center w-full">
-                <!-- Timezone info will be displayed here -->
+                <!-- Múi giờ sẽ hiển thị ở đây -->
             </div>
             <p id="geolocation-status" class="text-sm text-gray-400 mt-2 text-center">
-                <!-- Geolocation status will be displayed here -->
+                <!-- Trạng thái xác định vị trí sẽ hiển thị ở đây -->
             </p>
         </div>
 
-        <!-- Background music control section -->
-        <div class="w-full flex flex-col items-center p-4 bg-gray-700 rounded-xl shadow-md">
-            <h2 class="text-2xl font-bold mb-3 text-emerald-300" id="music-section-title"></h2>
-            
-            <!-- Audio element for background music -->
-            <audio id="background-music" loop>
-            <source src="marshmello-alone.mp3" type="audio/mpeg">
-            Trình duyệt của bạn không hỗ trợ audio.
-        </audio>
-
-            <button id="toggle-music-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 w-auto">
-                <!-- Music toggle button text will be updated by JavaScript -->
-            </button>
-            <p id="music-disclaimer" class="text-sm text-gray-400 mt-2 text-center"></p>
-        </div>
-
-        <!-- Contact information -->
+        <!-- Thông tin liên hệ -->
         <div class="text-gray-500 text-sm mt-4 text-center" id="contact-info">
             <p></p>
             <p></p>
@@ -110,11 +108,7 @@
                 geolocationNotSupported: "Trình duyệt của bạn không hỗ trợ Geolocation API.",
                 madeBy: "Được tạo bởi Richard",
                 contactEmail: "Email: ",
-                contactUs: "(Liên hệ chúng tôi để sửa lỗi khi trang web gặp sự cố hoặc lỗi múi giờ)",
-                musicSectionTitle: "Nhạc Nền",
-                playMusicButton: "Bật Nhạc",
-                pauseMusicButton: "Tắt Nhạc",
-                musicDisclaimer: "Lưu ý: Bạn không thể phát nhạc trực tiếp từ Spotify/YouTube. Hãy dùng link MP3 trực tiếp. Nhấn nút để bật/tắt nhạc."
+                contactUs: "(Liên hệ chúng tôi để sửa lỗi khi trang web gặp sự cố hoặc lỗi múi giờ)"
             },
             'en-US': {
                 title: "Digital Clock",
@@ -142,11 +136,7 @@
                 geolocationNotSupported: "Your browser does not support Geolocation API.",
                 madeBy: "Made by Richard",
                 contactEmail: "Email: ",
-                contactUs: "(Contact us to fix errors when the website has problems or timezone errors)",
-                musicSectionTitle: "Background Music",
-                playMusicButton: "Play Music",
-                pauseMusicButton: "Pause Music",
-                musicDisclaimer: "Note: You cannot play music directly from Spotify/YouTube. Use a direct MP3 link. Click to toggle music."
+                contactUs: "(Contact us to fix errors when the website has problems or timezone errors)"
             },
             'fr-FR': {
                 title: "Horloge Numérique",
@@ -174,11 +164,7 @@
                 geolocationNotSupported: "Votre navigateur ne prend pas en charge l'API de géolocalisation.",
                 madeBy: "Créé par Richard",
                 contactEmail: "E-mail : ",
-                contactUs: "(Contactez-nous pour corriger les erreurs lorsque le site web a des problèmes ou des erreurs de fuseau horaire)",
-                musicSectionTitle: "Musique de Fond",
-                playMusicButton: "Activer la musique",
-                pauseMusicButton: "Désactiver la musique",
-                musicDisclaimer: "Note: Vous ne pouvez pas écouter de la musique directement depuis Spotify/YouTube. Utilisez un lien MP3 direct. Cliquez pour activer/désactiver la musique."
+                contactUs: "(Contactez-nous pour corriger les erreurs lorsque le site web a des problèmes ou des erreurs de fuseau horaire)"
             },
             'es-ES': {
                 title: "Reloj Digital",
@@ -204,11 +190,7 @@
                 geolocationNotSupported: "Su navegador no soporta la API de Geolocation.",
                 madeBy: "Hecho por Richard",
                 contactEmail: "Correo electrónico: ",
-                contactUs: "(Contáctenos para solucionar errores cuando el sitio web tenga problemas o errores de zona horaria)",
-                musicSectionTitle: "Música de Fondo",
-                playMusicButton: "Reproducir Música",
-                pauseMusicButton: "Pausar Música",
-                musicDisclaimer: "Nota: No puedes reproducir música directamente desde Spotify/YouTube. Usa un enlace MP3 directo. Haz clic para activar/desactivar la música."
+                contactUs: "(Contáctenos para solucionar errores cuando el sitio web tenga problemas o errores de zona horaria)"
             },
             'de-DE': {
                 title: "Digitale Uhr",
@@ -234,11 +216,7 @@
                 geolocationNotSupported: "Ihr Browser unterstützt die Geolocation API nicht.",
                 madeBy: "Erstellt von Richard",
                 contactEmail: "E-Mail: ",
-                contactUs: "(Kontaktieren Sie uns, um Fehler zu beheben, wenn die Website Probleme oder Zeitzonenfehler aufweist)",
-                musicSectionTitle: "Hintergrundmusik",
-                playMusicButton: "Musik abspielen",
-                pauseMusicButton: "Musik pausieren",
-                musicDisclaimer: "Hinweis: Sie können Musik nicht direkt von Spotify/YouTube abspielen. Verwenden Sie einen direkten MP3-Link. Klicken Sie, um die Musik ein-/auszuschalten."
+                contactUs: "(Kontaktieren Sie uns, um Fehler zu beheben, wenn die Website Probleme oder Zeitzonenfehler aufweist)"
             },
             'zh-CN': {
                 title: "数字时钟",
@@ -264,11 +242,7 @@
                 geolocationNotSupported: "您的浏览器不支持地理定位API。",
                 madeBy: "由 Richard 制作",
                 contactEmail: "电子邮件: ",
-                contactUs: "(网站出现问题或时区错误时请联系我们修复)",
-                musicSectionTitle: "背景音乐",
-                playMusicButton: "播放音乐",
-                pauseMusicButton: "暂停音乐",
-                musicDisclaimer: "注意: 您无法直接从Spotify/YouTube播放音乐。请使用直接的MP3链接。点击以切换音乐。"
+                contactUs: "(网站出现问题或时区错误时请联系我们修复)"
             },
             'ja-JP': {
                 title: "デジタル時計",
@@ -294,11 +268,7 @@
                 geolocationNotSupported: "お使いのブラウザはGeolocation APIをサポートしていません。",
                 madeBy: "Richard 作",
                 contactEmail: "メール: ",
-                contactUs: "(ウェブサイトに問題やタイムゾーンエラーがある場合は、お問い合わせください)",
-                musicSectionTitle: "BGM",
-                playMusicButton: "音楽を再生",
-                pauseMusicButton: "音楽を一時停止",
-                musicDisclaimer: "注: Spotify/YouTubeから直接音楽を再生することはできません。直接のMP3リンクを使用してください。クリックして音楽を切り替えます。"
+                contactUs: "(ウェブサイトに問題やタイムゾーンエラーがある場合は、お問い合わせください)"
             },
             'ru-RU': {
                 title: "Цифровые Часы",
@@ -324,11 +294,7 @@
                 geolocationNotSupported: "Ваш браузер не поддерживает Geolocation API." ,
                 madeBy: "Сделано Richard",
                 contactEmail: "Эл. почта: ",
-                contactUs: "(Свяжитесь с нами для исправления ошибок, если на сайте возникнут проблемы или ошибки часового пояса)",
-                musicSectionTitle: "Фоновая музыка",
-                playMusicButton: "Включить музыку",
-                pauseMusicButton: "Выключить музыку",
-                musicDisclaimer: "Примечание: Вы не можете воспроизводить музыку напрямую из Spotify/YouTube. Используйте прямую ссылку на MP3. Нажмите, чтобы переключить музыку."
+                contactUs: "(Свяжитесь с нами для исправления ошибок, если на сайте возникнут проблемы или ошибки часового пояса)"
             },
             'ar-SA': { // Arabic (Saudi Arabia)
                 title: "ساعة رقمية",
@@ -353,11 +319,7 @@
                 geolocationNotSupported: "متصفحك لا يدعم واجهة برمجة تطبيقات تحديد الموقع الجغرافي.",
                 madeBy: "صنع بواسطة ريتشارد",
                 contactEmail: "البريد الإلكتروني: ",
-                contactUs: "(اتصل بنا لإصلاح الأخطاء عندما يواجه الموقع مشاكل أو أخطاء في المنطقة الزمنية)",
-                musicSectionTitle: "الموسيقى الخلفية",
-                playMusicButton: "تشغيل الموسيقى",
-                pauseMusicButton: "إيقاف الموسيقى مؤقتًا",
-                musicDisclaimer: "ملاحظة: لا يمكنك تشغيل الموسيقى مباشرة من Spotify/YouTube. استخدم رابط MP3 مباشرًا. انقر لتبديل الموسيقى."
+                contactUs: "(اتصل بنا لإصلاح الأخطاء عندما يواجه الموقع مشاكل أو أخطاء في المنطقة الزمنية)"
             }
         };
 
@@ -385,13 +347,6 @@
             contactInfoDiv.querySelector('p:nth-child(1)').textContent = currentTranslation.madeBy;
             contactInfoDiv.querySelector('p:nth-child(2)').innerHTML = `${currentTranslation.contactEmail}<a href="mailto:trannguyen200829@gmail.com" class="text-blue-400 hover:underline">trannguyen200829@gmail.com</a>`;
             contactInfoDiv.querySelector('p:nth-child(3)').textContent = currentTranslation.contactUs;
-
-            // Update music section
-            document.getElementById('music-section-title').textContent = currentTranslation.musicSectionTitle;
-            const toggleMusicButton = document.getElementById('toggle-music-btn');
-            // Update button text based on initial music state (usually paused)
-            toggleMusicButton.textContent = currentTranslation.playMusicButton; 
-            document.getElementById('music-disclaimer').textContent = currentTranslation.musicDisclaimer;
         }
 
         /**
@@ -566,27 +521,6 @@
             }
         });
 
-        // Event listener for the background music toggle button
-        document.getElementById('toggle-music-btn').addEventListener('click', () => {
-            const backgroundMusic = document.getElementById('background-music');
-            const toggleMusicButton = document.getElementById('toggle-music-btn');
-
-            if (backgroundMusic.paused) {
-                backgroundMusic.play()
-                    .then(() => {
-                        toggleMusicButton.textContent = currentTranslation.pauseMusicButton;
-                    })
-                    .catch(error => {
-                        console.error("Error trying to play music:", error);
-                        // Update text to indicate error if music cannot be played
-                        document.getElementById('music-disclaimer').textContent = `${currentTranslation.musicDisclaimer} Error: ${error.message}.`;
-                    });
-            } else {
-                backgroundMusic.pause();
-                toggleMusicButton.textContent = currentTranslation.playMusicButton;
-            }
-        });
-
         // --- Initialization when the page loads ---
         window.onload = function() {
             // Detect user's preferred language from the browser
@@ -622,6 +556,33 @@
             updateClock(); // Update clock for the first time
             displaySystemTimeZone(); // Display system timezone on page load
             setInterval(updateClock, 1000); // Update clock every second
+            
+            // --- Music Autoplay Logic (Attempt to play when user interacts) ---
+            const backgroundMusic = document.createElement('audio');
+            backgroundMusic.id = 'background-music';
+            backgroundMusic.loop = true;
+            backgroundMusic.autoplay = true; // Attempt autoplay
+            // IMPORTANT: Replace this with your own royalty-free music.
+            // Spotify/YouTube links are not directly embeddable for background audio.
+            backgroundMusic.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'; 
+            document.body.appendChild(backgroundMusic); // Add audio element to body
+
+            // Try to play music on first user interaction with the document
+            // This is a common workaround for browser autoplay policies
+            const playMusicOnInteraction = () => {
+                backgroundMusic.play().catch(error => {
+                    console.warn("Autoplay was prevented or failed:", error);
+                    // You might want to display a message to the user here
+                    // e.g., "Tap to enable music" if you had a dedicated UI element
+                });
+                // Remove the event listener after the first interaction
+                document.removeEventListener('click', playMusicOnInteraction);
+                document.removeEventListener('touchend', playMusicOnInteraction);
+            };
+
+            // Add event listeners for common user interactions
+            document.addEventListener('click', playMusicOnInteraction);
+            document.addEventListener('touchend', playMusicOnInteraction);
         };
     </script>
 </body>
