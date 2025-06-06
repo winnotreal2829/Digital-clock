@@ -8,14 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif; /* Sử dụng font Inter */
-            background-color: #1a202c; /* Nền tối */
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+            background-color: #1a202c; /* Dark background */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* Ngăn cuộn */
+            overflow: hidden; /* Prevent scrolling */
         }
     </style>
 </head>
@@ -23,40 +23,56 @@
     <div class="flex flex-col items-center justify-center p-6 bg-gray-800 rounded-3xl shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out w-11/12 md:w-3/4 lg:w-1/2 xl:w-2/5">
         <h1 class="text-3xl md:text-4xl font-bold mb-4 text-emerald-400 text-center"></h1>
         
-        <!-- Hiển thị Ngày, Tháng, Năm Dương Lịch -->
+        <!-- Display Date, Month, Year (Gregorian Calendar) -->
         <div id="date-display" class="text-xl md:text-2xl font-medium text-gray-300 mb-2 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
-            <!-- Ngày Dương Lịch sẽ được cập nhật bởi JavaScript -->
+            <!-- Gregorian Date will be updated by JavaScript -->
         </div>
 
-        <!-- Hiển thị Pha Mặt Trăng -->
+        <!-- Display Moon Phase -->
         <div id="moon-phase-display" class="text-xl md:text-2xl font-medium text-purple-300 mb-2 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
-            <!-- Pha Mặt Trăng sẽ được cập nhật bởi JavaScript -->
+            <!-- Moon Phase will be updated by JavaScript -->
         </div>
 
-        <!-- Hiển thị Lịch Âm Xấp Xỉ -->
+        <!-- Display Approximate Lunar Calendar -->
         <div id="lunar-date-display" class="text-xl md:text-2xl font-medium text-yellow-300 mb-4 bg-gray-700 px-5 py-2 rounded-xl text-center w-full">
-            <!-- Lịch Âm sẽ được cập nhật bởi JavaScript -->
+            <!-- Lunar Date will be updated by JavaScript -->
         </div>
 
-        <!-- Hiển thị Giờ, Phút, Giây -->
+        <!-- Display Hour, Minute, Second -->
         <div id="time-display" class="text-5xl md:text-7xl font-extrabold text-white mb-6 bg-gray-700 p-5 rounded-xl shadow-inner tracking-wider w-full text-center">
-            <!-- Thời gian sẽ được cập nhật bởi JavaScript -->
+            <!-- Time will be updated by JavaScript -->
         </div>
 
-        <!-- Phần múi giờ và nút xác định vị trí -->
+        <!-- Timezone section and detection button -->
         <div class="flex flex-col items-center mb-4 w-full">
             <button id="get-timezone-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 mb-3 w-auto md:w-3/4 lg:w-2/3">
-                <!-- Nút sẽ được cập nhật bởi JavaScript -->
+                <!-- Button text will be updated by JavaScript -->
             </button>
             <div id="timezone-info" class="text-lg md:text-xl font-semibold text-teal-300 bg-gray-700 px-4 py-2 rounded-lg text-center w-full">
-                <!-- Múi giờ sẽ hiển thị ở đây -->
+                <!-- Timezone info will be displayed here -->
             </div>
             <p id="geolocation-status" class="text-sm text-gray-400 mt-2 text-center">
-                <!-- Trạng thái xác định vị trí sẽ hiển thị ở đây -->
+                <!-- Geolocation status will be displayed here -->
             </p>
         </div>
 
-        <!-- Thông tin liên hệ -->
+        <!-- Background music control section -->
+        <div class="w-full flex flex-col items-center p-4 bg-gray-700 rounded-xl shadow-md">
+            <h2 class="text-2xl font-bold mb-3 text-emerald-300" id="music-section-title"></h2>
+            
+            <!-- Audio element for background music -->
+            <audio id="background-music" loop>
+            <source src="marshmello-alone.mp3" type="audio/mpeg">
+            Trình duyệt của bạn không hỗ trợ audio.
+        </audio>
+
+            <button id="toggle-music-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 w-auto">
+                <!-- Music toggle button text will be updated by JavaScript -->
+            </button>
+            <p id="music-disclaimer" class="text-sm text-gray-400 mt-2 text-center"></p>
+        </div>
+
+        <!-- Contact information -->
         <div class="text-gray-500 text-sm mt-4 text-center" id="contact-info">
             <p></p>
             <p></p>
@@ -66,7 +82,7 @@
     </div>
 
     <script>
-        // Đối tượng chứa tất cả các chuỗi dịch cho các ngôn ngữ khác nhau
+        // Object containing all translated strings for different languages
         const translations = {
             'vi-VN': {
                 title: "Đồng Hồ Kỹ Thuật Số",
@@ -94,7 +110,11 @@
                 geolocationNotSupported: "Trình duyệt của bạn không hỗ trợ Geolocation API.",
                 madeBy: "Được tạo bởi Richard",
                 contactEmail: "Email: ",
-                contactUs: "(Liên hệ chúng tôi để sửa lỗi khi trang web gặp sự cố hoặc lỗi múi giờ)"
+                contactUs: "(Liên hệ chúng tôi để sửa lỗi khi trang web gặp sự cố hoặc lỗi múi giờ)",
+                musicSectionTitle: "Nhạc Nền",
+                playMusicButton: "Bật Nhạc",
+                pauseMusicButton: "Tắt Nhạc",
+                musicDisclaimer: "Lưu ý: Bạn không thể phát nhạc trực tiếp từ Spotify/YouTube. Hãy dùng link MP3 trực tiếp. Nhấn nút để bật/tắt nhạc."
             },
             'en-US': {
                 title: "Digital Clock",
@@ -122,7 +142,11 @@
                 geolocationNotSupported: "Your browser does not support Geolocation API.",
                 madeBy: "Made by Richard",
                 contactEmail: "Email: ",
-                contactUs: "(Contact us to fix errors when the website has problems or timezone errors)"
+                contactUs: "(Contact us to fix errors when the website has problems or timezone errors)",
+                musicSectionTitle: "Background Music",
+                playMusicButton: "Play Music",
+                pauseMusicButton: "Pause Music",
+                musicDisclaimer: "Note: You cannot play music directly from Spotify/YouTube. Use a direct MP3 link. Click to toggle music."
             },
             'fr-FR': {
                 title: "Horloge Numérique",
@@ -150,7 +174,11 @@
                 geolocationNotSupported: "Votre navigateur ne prend pas en charge l'API de géolocalisation.",
                 madeBy: "Créé par Richard",
                 contactEmail: "E-mail : ",
-                contactUs: "(Contactez-nous pour corriger les erreurs lorsque le site web a des problèmes ou des erreurs de fuseau horaire)"
+                contactUs: "(Contactez-nous pour corriger les erreurs lorsque le site web a des problèmes ou des erreurs de fuseau horaire)",
+                musicSectionTitle: "Musique de Fond",
+                playMusicButton: "Activer la musique",
+                pauseMusicButton: "Désactiver la musique",
+                musicDisclaimer: "Note: Vous ne pouvez pas écouter de la musique directement depuis Spotify/YouTube. Utilisez un lien MP3 direct. Cliquez pour activer/désactiver la musique."
             },
             'es-ES': {
                 title: "Reloj Digital",
@@ -176,7 +204,11 @@
                 geolocationNotSupported: "Su navegador no soporta la API de Geolocation.",
                 madeBy: "Hecho por Richard",
                 contactEmail: "Correo electrónico: ",
-                contactUs: "(Contáctenos para solucionar errores cuando el sitio web tenga problemas o errores de zona horaria)"
+                contactUs: "(Contáctenos para solucionar errores cuando el sitio web tenga problemas o errores de zona horaria)",
+                musicSectionTitle: "Música de Fondo",
+                playMusicButton: "Reproducir Música",
+                pauseMusicButton: "Pausar Música",
+                musicDisclaimer: "Nota: No puedes reproducir música directamente desde Spotify/YouTube. Usa un enlace MP3 directo. Haz clic para activar/desactivar la música."
             },
             'de-DE': {
                 title: "Digitale Uhr",
@@ -202,7 +234,11 @@
                 geolocationNotSupported: "Ihr Browser unterstützt die Geolocation API nicht.",
                 madeBy: "Erstellt von Richard",
                 contactEmail: "E-Mail: ",
-                contactUs: "(Kontaktieren Sie uns, um Fehler zu beheben, wenn die Website Probleme oder Zeitzonenfehler aufweist)"
+                contactUs: "(Kontaktieren Sie uns, um Fehler zu beheben, wenn die Website Probleme oder Zeitzonenfehler aufweist)",
+                musicSectionTitle: "Hintergrundmusik",
+                playMusicButton: "Musik abspielen",
+                pauseMusicButton: "Musik pausieren",
+                musicDisclaimer: "Hinweis: Sie können Musik nicht direkt von Spotify/YouTube abspielen. Verwenden Sie einen direkten MP3-Link. Klicken Sie, um die Musik ein-/auszuschalten."
             },
             'zh-CN': {
                 title: "数字时钟",
@@ -228,7 +264,11 @@
                 geolocationNotSupported: "您的浏览器不支持地理定位API。",
                 madeBy: "由 Richard 制作",
                 contactEmail: "电子邮件: ",
-                contactUs: "(网站出现问题或时区错误时请联系我们修复)"
+                contactUs: "(网站出现问题或时区错误时请联系我们修复)",
+                musicSectionTitle: "背景音乐",
+                playMusicButton: "播放音乐",
+                pauseMusicButton: "暂停音乐",
+                musicDisclaimer: "注意: 您无法直接从Spotify/YouTube播放音乐。请使用直接的MP3链接。点击以切换音乐。"
             },
             'ja-JP': {
                 title: "デジタル時計",
@@ -254,7 +294,11 @@
                 geolocationNotSupported: "お使いのブラウザはGeolocation APIをサポートしていません。",
                 madeBy: "Richard 作",
                 contactEmail: "メール: ",
-                contactUs: "(ウェブサイトに問題やタイムゾーンエラーがある場合は、お問い合わせください)"
+                contactUs: "(ウェブサイトに問題やタイムゾーンエラーがある場合は、お問い合わせください)",
+                musicSectionTitle: "BGM",
+                playMusicButton: "音楽を再生",
+                pauseMusicButton: "音楽を一時停止",
+                musicDisclaimer: "注: Spotify/YouTubeから直接音楽を再生することはできません。直接のMP3リンクを使用してください。クリックして音楽を切り替えます。"
             },
             'ru-RU': {
                 title: "Цифровые Часы",
@@ -280,7 +324,11 @@
                 geolocationNotSupported: "Ваш браузер не поддерживает Geolocation API." ,
                 madeBy: "Сделано Richard",
                 contactEmail: "Эл. почта: ",
-                contactUs: "(Свяжитесь с нами для исправления ошибок, если на сайте возникнут проблемы или ошибки часового пояса)"
+                contactUs: "(Свяжитесь с нами для исправления ошибок, если на сайте возникнут проблемы или ошибки часового пояса)",
+                musicSectionTitle: "Фоновая музыка",
+                playMusicButton: "Включить музыку",
+                pauseMusicButton: "Выключить музыку",
+                musicDisclaimer: "Примечание: Вы не можете воспроизводить музыку напрямую из Spotify/YouTube. Используйте прямую ссылку на MP3. Нажмите, чтобы переключить музыку."
             },
             'ar-SA': { // Arabic (Saudi Arabia)
                 title: "ساعة رقمية",
@@ -305,61 +353,72 @@
                 geolocationNotSupported: "متصفحك لا يدعم واجهة برمجة تطبيقات تحديد الموقع الجغرافي.",
                 madeBy: "صنع بواسطة ريتشارد",
                 contactEmail: "البريد الإلكتروني: ",
-                contactUs: "(اتصل بنا لإصلاح الأخطاء عندما يواجه الموقع مشاكل أو أخطاء في المنطقة الزمنية)"
+                contactUs: "(اتصل بنا لإصلاح الأخطاء عندما يواجه الموقع مشاكل أو أخطاء في المنطقة الزمنية)",
+                musicSectionTitle: "الموسيقى الخلفية",
+                playMusicButton: "تشغيل الموسيقى",
+                pauseMusicButton: "إيقاف الموسيقى مؤقتًا",
+                musicDisclaimer: "ملاحظة: لا يمكنك تشغيل الموسيقى مباشرة من Spotify/YouTube. استخدم رابط MP3 مباشرًا. انقر لتبديل الموسيقى."
             }
         };
 
-        // Biến toàn cục để lưu trữ bản dịch hiện tại
+        // Global variable to store the current translation
         let currentTranslation;
 
         /**
-         * Hàm này khởi tạo và cập nhật các phần tử giao diện người dùng tĩnh
-         * dựa trên ngôn ngữ được phát hiện.
-         * Tham số:
-         * - localeKey: Khóa ngôn ngữ đã được chọn từ đối tượng translations (ví dụ: 'vi-VN', 'en-US').
+         * This function initializes and updates static UI elements
+         * based on the detected language.
+         * Parameter:
+         * - localeKey: The selected language key from the translations object (e.g., 'vi-VN', 'en-US').
          */
         function initializeUIText(localeKey) {
             currentTranslation = translations[localeKey];
 
-            // Cập nhật tiêu đề
+            // Update title
             document.querySelector('h1').textContent = currentTranslation.title;
 
-            // Cập nhật nút múi giờ
+            // Update timezone button
             document.getElementById('get-timezone-btn').textContent = currentTranslation.timezoneButton;
             document.getElementById('timezone-info').textContent = currentTranslation.timezoneInfoDefault;
 
-            // Cập nhật thông tin liên hệ
+            // Update contact information
             const contactInfoDiv = document.getElementById('contact-info');
             contactInfoDiv.querySelector('p:nth-child(1)').textContent = currentTranslation.madeBy;
             contactInfoDiv.querySelector('p:nth-child(2)').innerHTML = `${currentTranslation.contactEmail}<a href="mailto:trannguyen200829@gmail.com" class="text-blue-400 hover:underline">trannguyen200829@gmail.com</a>`;
             contactInfoDiv.querySelector('p:nth-child(3)').textContent = currentTranslation.contactUs;
+
+            // Update music section
+            document.getElementById('music-section-title').textContent = currentTranslation.musicSectionTitle;
+            const toggleMusicButton = document.getElementById('toggle-music-btn');
+            // Update button text based on initial music state (usually paused)
+            toggleMusicButton.textContent = currentTranslation.playMusicButton; 
+            document.getElementById('music-disclaimer').textContent = currentTranslation.musicDisclaimer;
         }
 
         /**
-         * Hàm này tính toán pha mặt trăng hiện tại dựa trên ngày đã cho.
-         * Nó sử dụng một thuật toán đơn giản dựa trên chu kỳ trăng non.
-         * Tham số:
-         * - date: Đối tượng Date() hiện tại (UTC).
-         * - translations: Đối tượng bản dịch hiện tại.
-         * Trả về:
-         * - Một đối tượng chứa tên pha đã dịch và biểu tượng cảm xúc tương ứng.
+         * This function calculates the current moon phase based on the given date.
+         * It uses a simple algorithm based on the new moon cycle.
+         * Parameters:
+         * - date: The current Date() object (UTC).
+         * - translations: The current translation object.
+         * Returns:
+         * - An object containing the translated phase name and corresponding emoji.
          */
         function getMoonPhase(date, translations) {
-            // Ngày trăng non được biết đến gần đây (6 tháng 1 năm 2000, 18:15 UT)
-            // Sử dụng Date.UTC để đảm bảo tính toán không bị ảnh hưởng bởi múi giờ cục bộ.
+            // Known recent new moon date (January 6, 2000, 18:15 UT)
+            // Use Date.UTC to ensure calculations are not affected by local timezones.
             const epoch = new Date(Date.UTC(2000, 0, 6, 18, 15, 0)); 
-            const msPerDay = 24 * 60 * 60 * 1000;         // Số mili giây trong một ngày
-            const synodicMonth = 29.53058867;             // Chu kỳ giao hội trung bình của mặt trăng (khoảng 29.53 ngày)
+            const msPerDay = 24 * 60 * 60 * 1000;         // Milliseconds in a day
+            const synodicMonth = 29.53058867;             // Average synodic month cycle (approx. 29.53 days)
 
             const diffMs = date.getTime() - epoch.getTime();
             let diffDays = diffMs / msPerDay;
 
             let moonAge = diffDays % synodicMonth;
             if (moonAge < 0) {
-                moonAge += synodicMonth; // Đảm bảo giá trị dương
+                moonAge += synodicMonth; // Ensure positive value
             }
 
-            // Dùng tên pha từ đối tượng translations
+            // Use phase names from the translations object
             const phaseNames = translations.moonPhases;
 
             if (moonAge < 1.84) return { name: phaseNames[0], emoji: "🌑" };
@@ -370,26 +429,26 @@
             if (moonAge < 20.30) return { name: phaseNames[5], emoji: "🌖" };
             if (moonAge < 23.99) return { name: phaseNames[6], emoji: "🌗" };
             if (moonAge < 27.69) return { name: phaseNames[7], emoji: "🌘" };
-            return { name: phaseNames[0], emoji: "🌑" }; // Quay lại trăng non
+            return { name: phaseNames[0], emoji: "🌑" }; // Revert to new moon
         }
 
         /**
-         * Hàm này tính toán ngày, tháng, năm âm lịch xấp xỉ dựa trên ngày dương lịch.
-         * LƯU Ý QUAN TRỌNG:
-         * Đây là một TÍNH TOÁN RẤT ĐƠN GIẢN VÀ XẤP XỈ.
-         * Nó KHÔNG ĐẠI DIỆN cho một lịch âm chính xác và đầy đủ (cần các thuật toán phức tạp,
-         * xử lý tháng nhuận, xác định khởi đầu năm âm lịch và các quy tắc của lịch âm truyền thống).
-         * Đối với độ chính xác trong thực tế, hãy cân nhắc sử dụng một thư viện lịch âm chuyên dụng.
+         * This function calculates the approximate lunar date, month, and year based on the Gregorian date.
+         * IMPORTANT NOTE:
+         * This is a VERY SIMPLE AND APPROXIMATE CALCULATION.
+         * It DOES NOT represent an accurate and complete lunar calendar (which requires complex algorithms,
+         * handling leap months, determining the start of the lunar year, and traditional lunar calendar rules).
+         * For real-world accuracy, consider using a specialized lunar calendar library.
          *
-         * Tham số:
-         * - date: Đối tượng Date() hiện tại (dương lịch).
-         * - translations: Đối tượng bản dịch hiện tại.
-         * Trả về:
-         * - Chuỗi ngày, tháng, năm âm lịch xấp xỉ đã dịch.
+         * Parameters:
+         * - date: The current Date() object (Gregorian).
+         * - translations: The current translation object.
+         * Returns:
+         * - The translated approximate lunar date, month, and year string.
          */
         function getApproximateLunarDate(date, translations) {
             const msPerDay = 24 * 60 * 60 * 1000;
-            const synodicMonth = 29.53058867; // Chiều dài trung bình của tháng giao hội
+            const synodicMonth = 29.53058867; // Average length of a synodic month
 
             const epochNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 15, 0));
 
@@ -407,9 +466,9 @@
             let lunarMonthApproxIndex = totalSynodicCycles % 12;
 
             const lunarMonthName = translations.lunarMonths[lunarMonthApproxIndex];
-            const lunarYear = date.getFullYear(); // Vẫn dùng năm dương lịch cho đơn giản
+            const lunarYear = date.getFullYear(); // Still using Gregorian year for simplicity
 
-            // Sử dụng template đã dịch
+            // Use the translated template
             let lunarDateString = translations.lunarDateTemplate
                 .replace('{day}', lunarDay)
                 .replace('{month}', lunarMonthName)
@@ -419,14 +478,14 @@
         }
 
         /**
-         * Hàm này cập nhật đồng hồ kỹ thuật số, pha mặt trăng và lịch âm xấp xỉ.
-         * Nó lấy ngày và giờ hiện tại, định dạng chúng và hiển thị lên trang.
-         * Đồng thời, nó tính toán và hiển thị pha mặt trăng và ngày, tháng, năm âm lịch xấp xỉ.
+         * This function updates the digital clock, moon phase, and approximate lunar date.
+         * It gets the current date and time, formats them, and displays them on the page.
+         * It also calculates and displays the moon phase and approximate lunar date.
          */
         function updateClock() {
-            const now = new Date(); // Lấy đối tượng ngày tháng hiện tại
+            const now = new Date(); // Get the current Date object
 
-            // Định dạng ngày Dương Lịch theo locale của người dùng
+            // Format Gregorian date based on user's locale
             const optionsDate = {
                 weekday: 'long', 
                 year: 'numeric', 
@@ -435,20 +494,20 @@
             };
             const dateString = now.toLocaleDateString(navigator.language, optionsDate); 
 
-            // Lấy pha mặt trăng và lịch âm xấp xỉ với đối tượng bản dịch hiện tại
+            // Get moon phase and approximate lunar date with the current translation object
             const moonPhase = getMoonPhase(now, currentTranslation);
             const approxLunarDate = getApproximateLunarDate(now, currentTranslation);
 
-            // Định dạng thời gian theo locale của người dùng
+            // Format time based on user's locale
             const optionsTime = {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false // Định dạng 24h
+                hour12: false // 24-hour format
             };
             const timeString = now.toLocaleTimeString(navigator.language, optionsTime); 
 
-            // Cập nhật các phần tử HTML
+            // Update HTML elements
             document.getElementById('date-display').textContent = dateString; 
             document.getElementById('moon-phase-display').textContent = `${moonPhase.emoji} ${moonPhase.name}`; 
             document.getElementById('lunar-date-display').textContent = approxLunarDate;
@@ -456,7 +515,7 @@
         }
 
         /**
-         * Hàm này hiển thị múi giờ hệ thống của người dùng.
+         * This function displays the user's system timezone.
          */
         function displaySystemTimeZone() {
             const timeZoneElement = document.getElementById('timezone-info');
@@ -465,11 +524,11 @@
                 timeZoneElement.textContent = `${currentTranslation.timezoneInfoSystem}${userTimeZone}`;
             } catch (error) {
                 timeZoneElement.textContent = currentTranslation.timezoneError;
-                console.error("Lỗi lấy múi giờ hệ thống:", error);
+                console.error("Error getting system time zone:", error);
             }
         }
 
-        // Lắng nghe sự kiện click cho nút xác định múi giờ
+        // Event listener for the timezone detection button
         document.getElementById('get-timezone-btn').addEventListener('click', () => {
             const geolocationStatus = document.getElementById('geolocation-status');
             geolocationStatus.textContent = currentTranslation.geolocationAttempt;
@@ -499,7 +558,7 @@
                                 geolocationStatus.textContent = currentTranslation.geolocationUnknownError;
                                 break;
                         }
-                        console.error("Lỗi xác định vị trí:", error);
+                        console.error("Geolocation error:", error);
                     }
                 );
             } else {
@@ -507,25 +566,47 @@
             }
         });
 
-        // --- Khởi tạo khi trang tải ---
-        window.onload = function() {
-            const userPreferredLocales = navigator.languages || [navigator.language || 'en-US'];
-            let foundLocaleKey = 'en-US'; // Mặc định là Tiếng Anh
+        // Event listener for the background music toggle button
+        document.getElementById('toggle-music-btn').addEventListener('click', () => {
+            const backgroundMusic = document.getElementById('background-music');
+            const toggleMusicButton = document.getElementById('toggle-music-btn');
 
-            // Tìm kiếm bản dịch phù hợp nhất
+            if (backgroundMusic.paused) {
+                backgroundMusic.play()
+                    .then(() => {
+                        toggleMusicButton.textContent = currentTranslation.pauseMusicButton;
+                    })
+                    .catch(error => {
+                        console.error("Error trying to play music:", error);
+                        // Update text to indicate error if music cannot be played
+                        document.getElementById('music-disclaimer').textContent = `${currentTranslation.musicDisclaimer} Error: ${error.message}.`;
+                    });
+            } else {
+                backgroundMusic.pause();
+                toggleMusicButton.textContent = currentTranslation.playMusicButton;
+            }
+        });
+
+        // --- Initialization when the page loads ---
+        window.onload = function() {
+            // Detect user's preferred language from the browser
+            const userPreferredLocales = navigator.languages || [navigator.language || 'en-US'];
+            let foundLocaleKey = 'en-US'; // Default to English
+
+            // Search for the most suitable translation
             for (const prefLocale of userPreferredLocales) {
                 const lowerCasePrefLocale = prefLocale.toLowerCase();
                 
-                // 1. Thử khớp chính xác (không phân biệt hoa/thường)
+                // 1. Try exact match (case-insensitive)
                 for (const key in translations) {
                     if (key.toLowerCase() === lowerCasePrefLocale) {
                         foundLocaleKey = key;
                         break; 
                     }
                 }
-                if (foundLocaleKey !== 'en-US') break; // Đã tìm thấy khớp chính xác
+                if (foundLocaleKey !== 'en-US') break; // Found exact match
 
-                // 2. Thử khớp theo ngôn ngữ cơ bản (không phân biệt hoa/thường)
+                // 2. Try to match by base language (case-insensitive)
                 const baseLang = lowerCasePrefLocale.split('-')[0];
                 for (const key in translations) {
                     if (key.toLowerCase().startsWith(baseLang)) {
@@ -533,14 +614,14 @@
                         break; 
                     }
                 }
-                if (foundLocaleKey !== 'en-US') break; // Đã tìm thấy khớp theo ngôn ngữ cơ bản
+                if (foundLocaleKey !== 'en-US') break; // Found base language match
             }
 
-            initializeUIText(foundLocaleKey); // Khởi tạo UI text với ngôn ngữ đã chọn
+            initializeUIText(foundLocaleKey); // Initialize UI text with the chosen language
 
-            updateClock(); // Cập nhật đồng hồ lần đầu
-            displaySystemTimeZone(); // Hiển thị múi giờ hệ thống
-            setInterval(updateClock, 1000); // Cập nhật đồng hồ mỗi giây
+            updateClock(); // Update clock for the first time
+            displaySystemTimeZone(); // Display system timezone on page load
+            setInterval(updateClock, 1000); // Update clock every second
         };
     </script>
 </body>
